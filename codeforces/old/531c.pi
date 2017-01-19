@@ -1,0 +1,30 @@
+main =>
+	A = read_int(),
+	B = read_int(),
+	C = read_int(),
+	Z = new_list(0),
+	X = 1,
+	Y = 1,
+	CNT = 0,
+	while (A*X + B*Y < C)
+		print(X),
+		print(" "),
+		println(Y),
+		if A*X + B*Y = C then
+			Z := Z ++ [X,Y],
+			CNT := CNT + 1
+		end,
+		if Y = 1000 then
+			Y = 0,
+			X := X + 1
+		end,
+		Y := Y + 1,
+		if A*X + B*Y > C then
+			Y = 1,
+			X := X + 1
+		end
+	end,
+	println(CNT),
+	foreach (N in Z)
+		println(N)
+	end

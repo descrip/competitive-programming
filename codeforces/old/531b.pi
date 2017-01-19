@@ -1,0 +1,4 @@
+main =>
+	S = read_line(),
+	print(reverse(slice(S,1,S.length div 2))),
+	println(reverse(slice(S,S.length div 2 + 1,S.length))).

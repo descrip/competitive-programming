@@ -1,0 +1,29 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+const int I = 0, MY = 1, WE = 2, MAXN = 100000;
+
+int main(){
+	cin.sync_with_stdio(0); cin.tie(0);
+	int n; cin >> n;
+	static int host[MAXN], proc[MAXN];
+	static pair<int,int> vert[MAXN];
+	for (int i = 0; i < n; ++i)
+		cin >> vert[i].first;
+	for (int i = 2; i < 2*n; ++i){
+		if (i % 2 == 0)
+			cin >> host[i/2];
+		else
+			cin >> proc[i/2];
+	}
+	for (int i = n-1; i >= 1; --i){
+		int b1 = vert[i].first, b2 = vert[i].second, a1 = vert[host[i]].first, a2 = vert[host[i]].second;
+		if (proc[i] == I)
+			vert[host[i]] = {a1+b2,max(a2+b1,a2+b2)};
+		else if (proc[i] == MY)
+			vert[host[i]] = {max(a1+b1,max(a1+b2,b1+a2)),a2+b2};
+		else if (proc[i] == WE)
+			vert[host[i]] = {max(a1+b2,b1+a2),a2+b2};
+	}
+	cout << max(vert[0].first,vert[0].second) << '\n';
+return 0;}

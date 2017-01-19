@@ -1,0 +1,14 @@
+main =>
+	A = read_int(),
+	B = read_int(),
+	C = read_int(),
+	R1 = (-B + sqrt(B*B - 4*A*C)) / (2*A),
+	R2 = (-B - sqrt(B*B - 4*A*C)) / (2*A),
+	if R1 = R2 then
+		println(R1)
+	else
+		print(min(R1,R2)),
+		print(" "),
+		print(max(R1,R2)),
+		print("\n")
+	end.

@@ -1,0 +1,111 @@
+#!/usr/bin/env bash
+# tester -- Test CCC solutions with given test data
+# Usage: tester filename 
+# e.g. tester sol/2014/s1.cpp
+
+replace_result () {
+	number=${filename:1:1}
+	rank=${filename:0:1}
+
+	if [[ $rank == 's' ]]
+	then
+		number=$(($number+5))
+	fi
+	
+	prev_result=$(sed $number'!d' sol/$year/results)
+
+	echo Previous result: $prev_result
+	echo "Current result:  "$result
+
+	if [[ $prev_result == '-' ]]
+	then
+		echo Overwriting previous result.
+		sed -i "${number}s/.*/${result}/" sol/$year/results
+		return
+	fi
+
+	for (( i=0; i<${#prev_result}; i++ ))
+	do
+		if [ ${prev_result:$i:1} == 'X' -o  ${prev_result:$i:1} == 'T' ]
+		then
+			if [ ${result:$i:1} == 'A' ]
+			then
+				echo Overwriting previous result.
+				sed -i "${number}s/.*/${result}/" sol/$year/results
+				return
+			fi
+		fi
+	done
+	
+	echo Not overwriting previous result.
+}
+
+set -um
+
+[ $# -gt 0 ] || { sed -n '2,/^#$/ s/^# //p' <"$0"; exit 1; }
+
+fullpath=$1						# sol/2014/s4.cpp
+year=${fullpath#*/}				
+year=${year%%/*}				# 2014
+fullfile=$(basename $fullpath)	# s4.cpp
+extension=${fullpath##*.}		# cpp
+filename=${fullfile%.*}			# s4
+
+mkdir -p comp
+
+if [ $extension == 'cpp' -o $extension == 'cc' ]
+then
+	g++ -std=c++11 -O2 -o comp/a.out $fullpath
+elif [ $extension == 'java' ]
+then
+	javac -d comp/ $fullpath
+fi
+
+result=''
+for testfile in tests/$year/$filename/$filename*.in
+do
+	testfilename=${testfile##*/}
+	testfilename=${testfilename%.*}
+	starttime=$(date +%s%3N)
+	
+	echo Starting testfile $testfilename...
+
+	if [ $extension == 'cpp' -o $extension = 'cc' ]
+	then
+		./comp/a.out < $testfile > comp/output 2>&1
+	elif [ $extension == 'py' ]
+	then
+		python3 $fullpath < $testfile > comp/output 2>&1
+	elif [ $extension == 'java' ]
+	then
+		java comp/$filename.class > comp/output 2>&1
+	fi
+
+	endtime=$(date +%s%3N)
+	runtime=$((($endtime-$starttime)))
+
+	if diff -b comp/output tests/$year/$filename/$testfilename.out > /dev/null
+	then
+		echo -n "Correct in $runtime ms. "
+		if [ $runtime -gt 5000 ]
+		then
+			echo 'Time limit of five seconds exceeded.'
+			result="${result}T"
+		else
+			echo ''
+			result="${result}A"
+		fi
+	else
+		echo -n "Incorrect in $runtime ms. "
+		result="${result}X"
+		if [ $runtime -gt 5000 ]
+		then
+			echo "Time limit of five seconds exceeded."
+		else
+			echo ''
+		fi
+	fi
+done
+replace_result year filename result
+
+rm -rf comp
