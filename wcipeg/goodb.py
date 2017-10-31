@@ -1,6 +1,6 @@
 import math
 mod = 10**9+7
-n, w, t, r = [int(_) for _ in input().split()]
+n, w, t, r = [int(x) for x in input().split()]
 w, t, r = sorted([w,t,r])
 ans = 1
 for i in range(w+1,n+1):
